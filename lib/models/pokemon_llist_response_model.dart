@@ -1,5 +1,3 @@
-
-
 class PokemonListResponse{
   int? count;
   String? next;
@@ -7,7 +5,8 @@ class PokemonListResponse{
   List<Pokemon>? results;
 
   PokemonListResponse({this.count, this.next, this.previous, this.results});
-  PokemonListResponse.fromJson(Map<String, dynamic> json){
+
+  PokemonListResponse.fromJson(Map<String, dynamic> json) {
     count = json['count'];
     next = json['next'];
     previous = json['previous'];
@@ -18,10 +17,21 @@ class PokemonListResponse{
       });
     }
   }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['count'] = count;
+    data['next'] = next;
+    data['previous'] = previous;
+    if (results != null) {
+      data['results'] = results!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
 }
 
 class Pokemon {
-   String? name;
+  String? name;
   String? url;
   String? image;
 
