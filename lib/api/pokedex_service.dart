@@ -1,8 +1,8 @@
-import 'dart:convert';
+
 import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:palette_generator/palette_generator.dart';
 import 'package:pekedex_app/models/pokemon_llist_response_model.dart';
 
@@ -17,13 +17,22 @@ class PokedexServices {
     final Response response= await _dio.get('$url/pokemon?limit=50&offset=0');
     final PokemonListResponse pokemonListResponse =
       PokemonListResponse.fromJson(response.data);
-      final List<Pokemon> pokemonList = pokemonListResponse.results!;
-      return await parseResponse(pokemonList);
+    final List<Pokemon> pokemonList = pokemonListResponse.results!;
+    return await parseResponse(pokemonList);
     }catch(e){
-      print(e);
+      rethrow;
     }
   }
-
+Future<List<Pokemon>> parseResponse(List<Pokemon> pokemons) async {
+    List<Pokemon> parsedPokemons = [];
+    for (Pokemon pokemon in pokemons) {
+      final String pokemonImage = await getPokemonImage(pokemon.url!);
+      pokemon.image = pokemonImage;
+      // pokemon.bgColor = bgColor;
+      parsedPokemons.add(pokemon);
+    }
+    return parsedPokemons;
+  }
   Future<String> getPokemonImage(String url)async{
     try {
       final Response response = await _dio.get(url);
@@ -37,16 +46,7 @@ class PokedexServices {
     }
   }
 
-  Future<List<Pokemon>> parseResponse(List<Pokemon> pokemons) async {
-    List<Pokemon> parsedPokemons = [];
-    for (Pokemon pokemon in pokemons) {
-      final String pokemonImage = await getPokemonImage(pokemon.url!);
-      pokemon.image = pokemonImage;
-      // pokemon.bgColor = bgColor;
-      parsedPokemons.add(pokemon);
-    }
-    return parsedPokemons;
-  }
+  
   Future<PokemonDetails> getPokemonDetails(String name) async {
     try {
       final Response response = await _dio.get('$url/pokemon/$name');
